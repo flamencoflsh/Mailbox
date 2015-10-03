@@ -21,8 +21,11 @@ class ViewController: UIViewController {
     @IBOutlet weak var messageView: UIImageView!
     var messageInitialCenter: CGPoint!
     var messageOriginalCenter: CGPoint!
+    var bgViewOriginalCenter: CGPoint!
     var laterIconInitialCenter: CGPoint!
     var laterIconOriginalCenter: CGPoint!
+    var archiveIconInitialCenter: CGPoint!
+    var archiveIconOriginalCenter: CGPoint!
     var gray: UIColor!
     var yellow: UIColor!
     var brown: UIColor!
@@ -45,8 +48,10 @@ class ViewController: UIViewController {
         red = makeRGB(235, G: 84, B: 51, alpha: 1)
         
         bgView.backgroundColor = gray
+        bgViewOriginalCenter = bgView.center
         messageOriginalCenter = messageView.center
         laterIconOriginalCenter = laterIcon.center
+        archiveIconOriginalCenter = archiveIcon.center
     }
 
     override func didReceiveMemoryWarning() {
@@ -65,6 +70,8 @@ class ViewController: UIViewController {
             messageInitialCenter = messageView.center
             laterIconInitialCenter = laterIcon.center
             laterIcon.image = UIImage(named: "later_icon")
+            archiveIconInitialCenter = archiveIcon.center
+            archiveIcon.image = UIImage(named: "archive_icon")
             
         }else if sender.state == UIGestureRecognizerState.Changed{
             print("changed!")
@@ -73,7 +80,7 @@ class ViewController: UIViewController {
             slide = translation.x
             
             laterIcon.alpha = 1
-            //archiveIcon.alpha = 1
+            archiveIcon.alpha = 1
             messageView.center = CGPoint(x: messageInitialCenter.x + slide, y:messageInitialCenter.y)
             
             if slide < 0 && slide > -45{
@@ -98,14 +105,26 @@ class ViewController: UIViewController {
                 bgView.backgroundColor = brown
                 laterIcon.center = CGPoint(x: laterIconInitialCenter.x + slide + 60, y: laterIconInitialCenter.y)
             }else if slide > 0 && slide < 45 {
-//                archiveIcon.alpha = -1/60*slide*0.7
-//                bgView.backgroundColor = gray
-//                print("alpha: \(archiveIcon.alpha)")
-//                archiveIcon.image = UIImage(named: "archive_icon")
+                archiveIcon.alpha = 1/60*slide*0.7
+                bgView.backgroundColor = gray
+                print("alpha: \(archiveIcon.alpha)")
+                archiveIcon.image = UIImage(named: "archive_icon")
+            }else if slide >= 45 && slide < 60{
+                archiveIcon.alpha = 1/60*slide
+                bgView.backgroundColor = gray
+                print("alpha: \(archiveIcon.alpha)")
+                archiveIcon.image = UIImage(named: "archive_icon")
+            }else if slide >= 60 && slide < 220{
+                archiveIcon.alpha = 1
+                archiveIcon.image = UIImage(named: "archive_icon")
+                bgView.backgroundColor = green
+                archiveIcon.center = CGPoint(x: archiveIconInitialCenter.x + slide - 60, y: archiveIconInitialCenter.y)
+                print("alpha: \(archiveIcon.alpha)")
+            }else if slide >= 220{
+                archiveIcon.image = UIImage(named: "delete_icon")
+                bgView.backgroundColor = red
+                archiveIcon.center = CGPoint(x: archiveIconInitialCenter.x + slide - 60, y: archiveIconInitialCenter.y)
             }
-            
-            print("laterIcon.center.x: \(laterIcon.center.x)")
-            print("slide: \(slide)")
             
         }else if sender.state == UIGestureRecognizerState.Ended{
             print("stopped!")
@@ -118,13 +137,18 @@ class ViewController: UIViewController {
                 laterIcon.image = UIImage(named: "later_icon")
                 print("alpha: \(laterIcon.alpha)")
                 print("messageOriginalCenter.x: \(messageOriginalCenter.x)")
+                print("archiveIconOriginalCenter.x: \(self.archiveIconOriginalCenter.x)")
+                
+                print("messageView.center.x: \(messageView.center.x)")
                 UIView.animateWithDuration(0.3, animations: { () -> Void in
                     self.messageView.center.x = self.messageOriginalCenter.x
                     self.laterIcon.center.x = self.laterIconOriginalCenter.x
-
+                    
+                print("messageView.center.x: \(self.messageView.center.x)")
                 })
-                            }else if slide < -60 && slide > -220{
+        }else if slide <= -60 && slide > -220{
                 laterIcon.alpha = 1
+                archiveIcon.alpha = 0
                 bgView.backgroundColor = yellow
                 laterIcon.image = UIImage(named: "later_icon")
                 UIView.animateWithDuration(0.4, animations: { () -> Void in
@@ -141,8 +165,9 @@ class ViewController: UIViewController {
         
                 })
                 
-            }else{
+            }else if slide <= -220{
                 laterIcon.alpha = 1
+                archiveIcon.alpha = 0
                 bgView.backgroundColor = brown
                 laterIcon.image = UIImage(named: "list_icon")
                 UIView.animateWithDuration(0.4, animations: { () -> Void in
@@ -159,6 +184,88 @@ class ViewController: UIViewController {
                                     self.messageView.center = self.messageOriginalCenter
                                     self.laterIcon.center = self.laterIconOriginalCenter
                             })})})
+            }else if slide > 0 && slide < 60{
+                
+                print("Inside!")
+                archiveIcon.alpha = 1
+                laterIcon.alpha = 0
+                bgView.backgroundColor = gray
+                archiveIcon.image = UIImage(named: "archive_icon")
+                print("alpha: \(archiveIcon.alpha)")
+                print("messageOriginalCenter.x: \(messageOriginalCenter.x)")
+                print("archiveIconOriginalCenter.x: \(self.archiveIconOriginalCenter.x)")
+                print("messageView.center.x: \(messageView.center.x)")
+
+                UIView.animateWithDuration(0.3, animations: { () -> Void in
+                    self.messageView.center.x = self.messageOriginalCenter.x
+                    self.archiveIcon.center.x = self.archiveIconOriginalCenter.x
+                    
+                })
+                
+                print("messageView.center.x: \(messageView.center.x)")
+                print("slide: \(slide)")
+                
+            }else if slide >= 60 && slide < 220{
+                archiveIcon.alpha = 1
+                laterIcon.alpha = 0
+                bgView.backgroundColor = green
+                archiveIcon.image = UIImage(named: "archive_icon")
+                UIView.animateWithDuration(0.4, animations: { () -> Void in
+                    
+                    print("Transforming: self.messageView.center.x: \(self.messageView.center.x)")
+                    print("archiveIcon.center.x: \(self.archiveIcon.center.x)")
+                    self.messageView.transform = CGAffineTransformMakeTranslation(self.messageView.center.x + 250, 0.0)
+                    self.archiveIcon.transform = CGAffineTransformMakeTranslation(self.messageView.center.x + 250, 0.0)
+                    }, completion: { (Bool) -> Void in
+                        UIView.animateWithDuration(0.4, animations: { () -> Void in
+                            print("In Completion: self.messageView.center.x: \(self.messageView.center.x)")
+                            print("archiveIcon.center.x: \(self.archiveIcon.center.x)")
+                                self.bgView.transform = CGAffineTransformMakeTranslation(0, -86)
+                            
+                            
+                                
+                                delay(0.4, closure: { () ->
+                                    () in
+                                    self.bgView.transform = CGAffineTransformMakeTranslation(0, 0)
+                                    self.messageView.transform = CGAffineTransformMakeTranslation(-1*self.messageView.center.x + 160, 0)
+                                    self.archiveIcon.transform = CGAffineTransformMakeTranslation(-1*self.archiveIcon.center.x + 30, 0)
+                                   
+                               
+                                })
+                                
+                                
+                        })
+                })
+                
+            }else if slide >= 220{
+                archiveIcon.alpha = 1
+                laterIcon.alpha = 0
+                bgView.backgroundColor = red
+                archiveIcon.image = UIImage(named: "delete_icon")
+                UIView.animateWithDuration(0.4, animations: { () -> Void in
+                    
+                    print("Transforming: self.messageView.center.x: \(self.messageView.center.x)")
+                    print("archiveIcon.center.x: \(self.archiveIcon.center.x)")
+                    self.messageView.transform = CGAffineTransformMakeTranslation(self.messageView.center.x + 250, 0.0)
+                    self.archiveIcon.transform = CGAffineTransformMakeTranslation(self.messageView.center.x + 250, 0.0)
+                    }, completion: { (Bool) -> Void in
+                        UIView.animateWithDuration(0.4, animations: { () -> Void in
+                            print("In Completion: self.messageView.center.x: \(self.messageView.center.x)")
+                            print("archiveIcon.center.x: \(self.archiveIcon.center.x)")
+                            self.bgView.transform = CGAffineTransformMakeTranslation(0, -86)
+                            
+                            
+                            
+                            delay(0.4, closure: { () ->
+                                () in
+                                self.bgView.transform = CGAffineTransformMakeTranslation(0, 0)
+                                self.messageView.transform = CGAffineTransformMakeTranslation(-1*self.messageView.center.x + 160, 0)
+                                self.archiveIcon.transform = CGAffineTransformMakeTranslation(-1*self.archiveIcon.center.x + 30, 0)
+                            })
+                            
+                            
+                        })
+                })
             }
         }
     }
