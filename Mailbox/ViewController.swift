@@ -37,6 +37,7 @@ class ViewController: UIViewController, UIActionSheetDelegate {
     @IBOutlet weak var laterNavImage: UIImageView!
     @IBOutlet weak var hiddenView: UIView!
     @IBOutlet weak var laterView: UIView!
+    @IBOutlet weak var menuView: UIView!
     
     
     var messageInitialCenter: CGPoint!
@@ -100,11 +101,54 @@ class ViewController: UIViewController, UIActionSheetDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    override func canBecomeFirstResponder() -> Bool {
+        return true
+    }
+    
+    override func motionEnded(motion: UIEventSubtype, withEvent event: UIEvent?) {
+        if motion == .MotionShake {
+            print("shaken, not stirred")
+            
+            
+            let alertController = UIAlertController(title: "Undo last action?", message: "Are you sure you want to undo and move 1 item from Archive back to inbox?", preferredStyle: .Alert)
+            
+            // create an Cancel action
+            let CancelAction = UIAlertAction(title: "Cancel", style: .Default) { (action) in
+                // handle response here.
+            }
+            // add the Cancel action to the alert controller
+            alertController.addAction(CancelAction)
+            
+            // create an OK action
+            let OKAction = UIAlertAction(title: "Undo", style: .Default) { (action) in
+                self.bgView.alpha = 0
+                
+                UIView.animateWithDuration(0.4, animations: { () -> Void in
+                    self.feedView.center.y = self.feedViewInitialCenter.y + 86
+                     self.bgView.alpha = 1
+                    }, completion: { (Bool) -> Void in
+                       
+                })
+                
+                
+            }
+            // add the OK action to the alert controller
+            alertController.addAction(OKAction)
+            self.presentViewController(alertController, animated: true) {
+                // optional code for what happens after the alert controller has finished presenting
+            }
+
+        }
+
+    }
+    
     
     @IBAction func didChangeViewControl(sender: AnyObject) {
         
         var viewSelections = ["later", "mail", "hidden"]
         var viewSelection = viewSelections[viewControl.selectedSegmentIndex]
+        hiddenView.alpha = 1
+        laterView.alpha = 1
         
         
         switch (viewSelection){
@@ -233,6 +277,8 @@ class ViewController: UIViewController, UIActionSheetDelegate {
         print("Right edge panned!")
         print("contentView.center.x #1: \(contentView.center.x)")
         print("self.contentViewOriginalCenter: \(self.contentViewOriginalCenter)")
+        hiddenView.alpha = 0
+        laterView.alpha = 0
         
         if open == true{
         
@@ -265,6 +311,8 @@ class ViewController: UIViewController, UIActionSheetDelegate {
     
     func onLeftEdgePan(sender: UIScreenEdgePanGestureRecognizer){
         print("Edge panning")
+        hiddenView.alpha = 0
+        laterView.alpha = 0
         let translation = sender.translationInView(view)
         
         if sender.state == UIGestureRecognizerState.Began{
@@ -356,21 +404,21 @@ class ViewController: UIViewController, UIActionSheetDelegate {
                 bgView.backgroundColor = gray
                 print("alpha: \(archiveIcon.alpha)")
                 archiveIcon.image = UIImage(named: "archive_icon")
-            }else if slide >= 45 && slide < 60{
+            }else if slide >= 45 && slide < 70{
                 archiveIcon.alpha = 1/60*slide
                 bgView.backgroundColor = gray
                 print("alpha: \(archiveIcon.alpha)")
                 archiveIcon.image = UIImage(named: "archive_icon")
-            }else if slide >= 60 && slide < 220{
+            }else if slide >= 70 && slide < 220{
                 archiveIcon.alpha = 1
                 archiveIcon.image = UIImage(named: "archive_icon")
                 bgView.backgroundColor = green
-                archiveIcon.center = CGPoint(x: archiveIconInitialCenter.x + slide - 60, y: archiveIconInitialCenter.y)
+                archiveIcon.center = CGPoint(x: archiveIconInitialCenter.x + slide - 70, y: archiveIconInitialCenter.y)
                 print("alpha: \(archiveIcon.alpha)")
             }else if slide >= 220{
                 archiveIcon.image = UIImage(named: "delete_icon")
                 bgView.backgroundColor = red
-                archiveIcon.center = CGPoint(x: archiveIconInitialCenter.x + slide - 60, y: archiveIconInitialCenter.y)
+                archiveIcon.center = CGPoint(x: archiveIconInitialCenter.x + slide - 70, y: archiveIconInitialCenter.y)
             }
             
         }else if sender.state == UIGestureRecognizerState.Ended{
@@ -476,7 +524,7 @@ class ViewController: UIViewController, UIActionSheetDelegate {
                                     () in
                                     self.bgView.transform = CGAffineTransformMakeTranslation(0, 0)
                                     self.messageView.transform = CGAffineTransformMakeTranslation(-1*self.messageView.center.x + 160, 0)
-                                    self.archiveIcon.transform = CGAffineTransformMakeTranslation(-1*self.archiveIcon.center.x + 30, 0)
+                                    self.archiveIcon.transform = CGAffineTransformMakeTranslation(-1*self.archiveIcon.center.x + 40, 0)
                                    
                                
                                 })
@@ -508,7 +556,7 @@ class ViewController: UIViewController, UIActionSheetDelegate {
                                 () in
                                 self.bgView.transform = CGAffineTransformMakeTranslation(0, 0)
                                 self.messageView.transform = CGAffineTransformMakeTranslation(-1*self.messageView.center.x + 160, 0)
-                                self.archiveIcon.transform = CGAffineTransformMakeTranslation(-1*self.archiveIcon.center.x + 30, 0)
+                                self.archiveIcon.transform = CGAffineTransformMakeTranslation(-1*self.archiveIcon.center.x + 40, 0)
                             })
                             
                             
